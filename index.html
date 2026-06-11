@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Rekod Latihan Guru</title>
+    <!-- Tailwind CSS untuk gaya antaramuka -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS untuk fungsi eksport ke Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
+        
+        <!-- Bahagian Pengepala -->
+        <div class="bg-indigo-700 px-6 py-4">
+            <h1 class="text-2xl font-bold text-white">Sistem Pemantauan Latihan Guru</h1>
+            <p class="text-indigo-200 text-sm mt-1">Senarai guru dan status latihan terkini.</p>
+        </div>
+
+        <div class="p-6">
+            <!-- Bahagian Butang Tindakan -->
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                
+                <!-- Butang Daftar Latihan (Pautan Google Form) -->
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLScomOHO8AuIOi8zwogQdx_PH01ToDnTttrHHJxGzWyKbyJlMg/viewform" 
+                   target="_blank" 
+                   class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors duration-200">
+                    <i class="fa-solid fa-clipboard-list mr-2"></i>
+                    Daftar Latihan Guru
+                </a>
+
+                <!-- Butang Muat Turun Excel -->
+                <button onclick="eksportKeExcel()" 
+                        class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                    <i class="fa-solid fa-file-excel mr-2"></i>
+                    Muat Turun Excel
+                </button>
+                
+            </div>
+
+            <!-- Bahagian Jadual -->
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table id="jadualGuru" class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Bil</th>
+                            <th scope="col" class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Daerah</th>
+                            <th scope="col" class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Nama Sekolah</th>
+                            <th scope="col" class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Nama Guru</th>
+                            <th scope="col" class="px-6 py-3 text-left font-semibold text-gray-700 uppercase tracking-wider">Latihan Diterima</th>
+                            <th scope="col" class="px-6 py-3 text-center font-semibold text-gray-700 uppercase tracking-wider">Status Guru</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <!-- Data Contoh 1 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">1</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">Kuantan</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">SMK Tengku Ampuan Afzan</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Ahmad bin Ali</td>
+                            <td class="px-6 py-4 text-gray-700">Integrasi AI dalam Pendidikan</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Selesai
+                                </span>
+                            </td>
+                        </tr>
+                        <!-- Data Contoh 2 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">2</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">Pekan</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">SK Pekan Jaya</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Siti Nurhaliza binti Othman</td>
+                            <td class="px-6 py-4 text-gray-700">Google Workspace for Education</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Sedang Berjalan
+                                </span>
+                            </td>
+                        </tr>
+                        <!-- Data Contoh 3 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">3</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">Temerloh</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">SMK Abu Bakar</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Mohd Faizal bin Ismail</td>
+                            <td class="px-6 py-4 text-gray-700">Asas Pengaturcaraan Python</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Belum Mula
+                                </span>
+                            </td>
+                        </tr>
+                        <!-- Data Contoh 4 -->
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">4</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">Jerantut</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">SK Jerantut</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Nurul Huda binti Hassan</td>
+                            <td class="px-6 py-4 text-gray-700">Didik Hibur dalam Bilik Darjah</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Selesai
+                                </span>
+                            </td>
+                        </tr>
+                         <!-- Data Contoh 5 -->
+                         <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">5</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">Bentong</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">SMK Sulaiman</td>
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Kamala a/p Subramaniam</td>
+                            <td class="px-6 py-4 text-gray-700">Pembelajaran Berasaskan Projek (PBL)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Selesai
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <p class="text-xs text-gray-400 mt-4 text-center">* Data di atas adalah contoh paparan sahaja. Data rasmi akan dimuat turun ke dalam Excel.</p>
+        </div>
+    </div>
+
+    <!-- Skrip fungsi -->
+    <script>
+        function eksportKeExcel() {
+            // Dapatkan elemen jadual
+            var jadual = document.getElementById("jadualGuru");
+            
+            // Tukar jadual HTML kepada lembaran kerja (worksheet)
+            var lembaranKerja = XLSX.utils.table_to_book(jadual, {sheet: "Data Latihan"});
+            
+            // Dapatkan tarikh hari ini untuk diletakkan pada nama fail
+            var tarikh = new Date();
+            var formatTarikh = tarikh.getFullYear() + "-" + (tarikh.getMonth() + 1).toString().padStart(2, '0') + "-" + tarikh.getDate().toString().padStart(2, '0');
+            
+            var namaFail = "Rekod_Latihan_Guru_" + formatTarikh + ".xlsx";
+            
+            // Muat turun fail Excel
+            XLSX.writeFile(lembaranKerja, namaFail);
+        }
+    </script>
+</body>
+</html>
